@@ -42,3 +42,31 @@ const listaIncidentes = await db.all(`SELECT * FROM incidentes`)
 res.json(listaIncidentes) //Entrega esses dados para o cliente em formato JSON
 
 } ) 
+
+// rota especifica
+
+app.get("/incidentes/:id", async (req,res) => {
+
+  const { id } = req.params
+
+  const db = await criarBanco()
+
+  const incidenteEspecifico = await db.all(`SELECT * FROM incidentes WHERE id = ?` , [id])
+  // esse ? é um espaço reservado que será preenchido pelo valor da variavel [id]
+
+  res.json(incidenteEspecifico)
+
+})
+
+//Rota POST - Novos Registros /Endpoints
+
+app.post("/incidentes", async (req, res) => {
+
+  const {tipo_problema, localizacao, descricao, prioridade, nome_solicitante, data_registro, hora_registro} = req.body
+
+  const db = await criarBanco()
+
+  await db.run(`INSERT INTO incidentes(tipo_problema, localizacao, descricao, prioridade, nome_solicitante, data_registro, hora_registro) VALUES (?, ?, ?, ?, ?, ?, ?)` , [tipo_problema, localizacao, descricao, prioridade, nome_solicitante, data_registro, hora_registro])
+
+  res.send(`incidentes novo registrado: ${tipo_problema} registrado na data ${data_registro} por ${nome_solicitante}`)
+})
